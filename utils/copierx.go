@@ -1,4 +1,4 @@
-package copierx
+package utils
 
 import (
 	"database/sql"
