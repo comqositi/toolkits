@@ -175,6 +175,7 @@ func (b *BaiduOcr) PdfUrlToWord(pdfUrl string) (word string, fileSuffix string, 
 	if numPages > 21 {
 		return "", "", 0, errors.New("pdf文件不能超过20页！")
 	}
+	defer os.Remove(filePath)
 
 	size, err := countSize(filePath)
 	if err != nil {
