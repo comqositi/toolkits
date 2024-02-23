@@ -10,6 +10,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 var (
@@ -142,6 +143,7 @@ func (b *BaiduOcr) PdfToWord(filePath string) (word string, fileSuffix string, F
 
 	var result string
 	for i := 1; i < numPages+1; i++ {
+		time.Sleep(time.Millisecond * 300)
 		payload := strings.NewReader("pdf_file=" + url.QueryEscape(encode) + "&pdf_file_num=" + strconv.Itoa(i) + "&detect_direction=false&detect_language=false&paragraph=false&probability=false")
 
 		str, err := b.commonFun(payload)
@@ -187,6 +189,7 @@ func (b *BaiduOcr) PdfUrlToWord(pdfUrl string) (word string, fileSuffix string, 
 
 	var result string
 	for i := 1; i < numPages+1; i++ {
+		time.Sleep(time.Millisecond * 300)
 		payload := strings.NewReader("pdf_file=" + url.QueryEscape(encode) + "&pdf_file_num=" + strconv.Itoa(i) + "&detect_direction=false&detect_language=false&paragraph=false&probability=false")
 
 		str, err := b.commonFun(payload)
