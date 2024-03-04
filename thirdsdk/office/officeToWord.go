@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"unicode/utf8"
 )
 
 type excelRes struct {
@@ -270,6 +271,10 @@ func TxtToContent(filePath string) (word string, fileSuffix string, FileSize int
 	text := string(content)
 	text = strings.Replace(text, "\n", " ", -1)
 
+	if !utf8.ValidString(text) {
+		return "", "", 0, errors.New("文件编码只能是UTF-8！")
+	}
+
 	return text, suffix, size, nil
 }
 
@@ -297,6 +302,11 @@ func TxtUrlToContent(url string) (word string, fileSuffix string, FileSize int, 
 		log.Fatal(err)
 	}
 	text := string(content)
+
+	if !utf8.ValidString(text) {
+		return "", "", 0, errors.New("文件编码只能是UTF-8！")
+	}
+
 	text = strings.Replace(text, "\n", " ", -1)
 
 	return text, suffix, size, nil
