@@ -17,6 +17,11 @@ type excelRes struct {
 	Answer   string `json:"answer"`   // 答案
 }
 
+type ExcelResult struct {
+	Name    string     `json:"name"`    // 问题
+	Content [][]string `json:"content"` // 答案
+}
+
 // word文件转文字
 func WordToContent(filePath string) (word string, fileSuffix string, FileSize int, err error) {
 	suffix, err := getSuffix(filePath)
@@ -112,6 +117,40 @@ func ExcelToContent(filePath string) (word []excelRes, fileSuffix string, FileSi
 	return list, suffix, size, nil
 }
 
+// ExcelToContentTwo excel文件转文字（方法二）
+func ExcelToContentTwo(filePath string) (word []ExcelResult, fileSuffix string, FileSize int, err error) {
+	var excelResult []ExcelResult
+	suffix, err := getSuffix(filePath)
+	if err != nil {
+		return excelResult, "", 0, errors.New("获取前缀失败！")
+	}
+	size, err := countSize(filePath)
+	if err != nil {
+		return excelResult, "", 0, errors.New("计算文件大小失败！")
+	}
+	xlFile, err := xlsx.OpenFile(filePath)
+	if err != nil {
+		return excelResult, "", 0, errors.New("打开文件失败！")
+	}
+
+	for _, sheet := range xlFile.Sheets {
+		list := ExcelResult{}
+		var table [][]string
+		for _, row := range sheet.Rows {
+			var rows []string
+			for _, cell := range row.Cells {
+				rows = append(rows, cell.String())
+			}
+			table = append(table, rows)
+		}
+
+		list.Content = table
+		list.Name = sheet.Name
+		excelResult = append(excelResult, list)
+	}
+	return excelResult, suffix, size, nil
+}
+
 // excel地址文件转文字
 func ExcelUrlToContent(url string) (word []excelRes, fileSuffix string, FileSize int, err error) {
 	var list []excelRes
@@ -150,6 +189,50 @@ func ExcelUrlToContent(url string) (word []excelRes, fileSuffix string, FileSize
 	}
 
 	return list, suffix, size, nil
+}
+
+// ExcelUrlToContentTwo excel地址文件转文字（方法二）
+func ExcelUrlToContentTwo(url string) (word []ExcelResult, fileSuffix string, FileSize int, err error) {
+	var excelResult []ExcelResult
+	suffix, err := getSuffix(url)
+	if err != nil {
+		return excelResult, "", 0, errors.New("获取前缀失败！")
+	}
+
+	filePath, err := saveFile(url, suffix)
+	if err != nil {
+		return excelResult, "", 0, errors.New("文件保存在本地失败！")
+	}
+
+	size, err := countSize(filePath)
+	if err != nil {
+		return excelResult, "", 0, errors.New("计算文件大小失败！")
+	}
+
+	xlFile, err := xlsx.OpenFile(filePath)
+	if err != nil {
+		return excelResult, "", 0, errors.New("打开文件失败！")
+	}
+
+	defer os.Remove(filePath)
+
+	for _, sheet := range xlFile.Sheets {
+		list := ExcelResult{}
+		var table [][]string
+		for _, row := range sheet.Rows {
+			var rows []string
+			for _, cell := range row.Cells {
+				rows = append(rows, cell.String())
+			}
+			table = append(table, rows)
+		}
+
+		list.Content = table
+		list.Name = sheet.Name
+		excelResult = append(excelResult, list)
+	}
+
+	return excelResult, suffix, size, nil
 }
 
 // ppt文件转文字
