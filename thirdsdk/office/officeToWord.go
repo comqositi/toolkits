@@ -191,7 +191,7 @@ func ExcelUrlToContent(url string) (word []excelRes, fileSuffix string, FileSize
 	return list, suffix, size, nil
 }
 
-// ExcelUrlToContentTwo excel地址文件转文字（方法二）
+// ExcelUrlToContentTwo  excel地址文件转文字（方法二）
 func ExcelUrlToContentTwo(url string) (word []ExcelResult, fileSuffix string, FileSize int, err error) {
 	var excelResult []ExcelResult
 	suffix, err := getSuffix(url)
