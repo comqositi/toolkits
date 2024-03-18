@@ -5,6 +5,8 @@ go 1.20
 require (
 	baliance.com/gooxml v1.0.1
 	github.com/jinzhu/copier v0.4.0
+	github.com/ledongthuc/pdf v0.0.0-20240201131950-da5b75280b06
+	github.com/nguyenthenguyen/docx v0.0.0-20230621112118-9c8e795a11db
 	github.com/tealeg/xlsx v1.0.5
 	github.com/unidoc/unipdf/v3 v3.52.0
 )

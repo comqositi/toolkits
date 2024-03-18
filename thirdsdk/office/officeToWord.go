@@ -1,9 +1,10 @@
 package office
 
 import (
-	"baliance.com/gooxml/document"
 	"baliance.com/gooxml/presentation"
+	"bytes"
 	"errors"
+	"github.com/ledongthuc/pdf"
 	"github.com/tealeg/xlsx"
 	"io/ioutil"
 	"log"
@@ -33,19 +34,23 @@ func WordToContent(filePath string) (word string, fileSuffix string, FileSize in
 		return "", "", 0, errors.New("计算文件大小失败！")
 	}
 
-	doc, err := document.Open(filePath)
+	//doc, err := document.Open(filePath)
+	//if err != nil {
+	//	return "", "", 0, errors.New("打开文件失败！")
+	//}
+	//
+	//// 遍历文档中的每个段落
+	//text := ""
+	//for _, p := range doc.Paragraphs() {
+	//	// 遍历段落中的每个 Run
+	//	for _, r := range p.Runs() {
+	//		// 打印 Run 的文本
+	//		text += r.Text()
+	//	}
+	//}
+	text, err := wordToData(filePath)
 	if err != nil {
-		return "", "", 0, errors.New("打开文件失败！")
-	}
-
-	// 遍历文档中的每个段落
-	text := ""
-	for _, p := range doc.Paragraphs() {
-		// 遍历段落中的每个 Run
-		for _, r := range p.Runs() {
-			// 打印 Run 的文本
-			text += r.Text()
-		}
+		return "", "", 0, err
 	}
 
 	return text, suffix, size, nil
@@ -70,20 +75,11 @@ func WordUrlToContent(url string) (word string, fileSuffix string, FileSize int,
 
 	defer os.Remove(filePath)
 
-	doc, err := document.Open(filePath)
+	text, err := wordToData(filePath)
 	if err != nil {
-		return "", "", 0, errors.New("打开文件失败！")
+		return "", "", 0, err
 	}
 
-	// 遍历文档中的每个段落
-	text := ""
-	for _, p := range doc.Paragraphs() {
-		// 遍历段落中的每个 Run
-		for _, r := range p.Runs() {
-			// 打印 Run 的文本
-			text += r.Text()
-		}
-	}
 	return text, suffix, size, nil
 }
 
@@ -233,6 +229,70 @@ func ExcelUrlToContentTwo(url string) (word []ExcelResult, fileSuffix string, Fi
 	}
 
 	return excelResult, suffix, size, nil
+}
+
+// PdfToContent pdf文件转文字
+func PdfToContent(filePath string) (word string, fileSuffix string, FileSize int, err error) {
+	suffix, err := getSuffix(filePath)
+	if err != nil {
+		return "", "", 0, errors.New("获取前缀失败！")
+	}
+	size, err := countSize(filePath)
+	if err != nil {
+		return "", "", 0, errors.New("计算文件大小失败！")
+	}
+
+	pdf.DebugOn = true
+	text, err := readPdf(filePath) // Read local pdf file
+	if err != nil {
+		return "", "", 0, errors.New("pdf获取数据失败！")
+	}
+
+	return text, suffix, size, nil
+}
+
+// PdfUrlToContent pdf url文件转文字
+func PdfUrlToContent(url string) (word string, fileSuffix string, FileSize int, err error) {
+	suffix, err := getSuffix(url)
+	if err != nil {
+		return "", "", 0, errors.New("获取前缀失败！")
+	}
+
+	filePath, err := saveFile(url, suffix)
+	if err != nil {
+		return "", "", 0, errors.New("文件保存在本地失败！")
+	}
+
+	size, err := countSize(filePath)
+	if err != nil {
+		return "", "", 0, errors.New("计算文件大小失败！")
+	}
+
+	defer os.Remove(filePath)
+
+	pdf.DebugOn = true
+	text, err := readPdf(filePath) // Read local pdf file
+	if err != nil {
+		return "", "", 0, errors.New("pdf url获取数据失败！")
+	}
+
+	return text, suffix, size, nil
+}
+
+func readPdf(path string) (string, error) {
+	f, r, err := pdf.Open(path)
+	// remember close file
+	defer f.Close()
+	if err != nil {
+		return "", err
+	}
+	var buf bytes.Buffer
+	b, err := r.GetPlainText()
+	if err != nil {
+		return "", err
+	}
+	buf.ReadFrom(b)
+	return buf.String(), nil
 }
 
 // ppt文件转文字
