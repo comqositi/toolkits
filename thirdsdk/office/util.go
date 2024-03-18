@@ -4,10 +4,12 @@ import (
 	"crypto/md5"
 	"errors"
 	"fmt"
+	"github.com/nguyenthenguyen/docx"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 )
 
@@ -73,4 +75,28 @@ func md5ByString(str string) (string, error) {
 	}
 	arr := m.Sum(nil)
 	return fmt.Sprintf("%x", arr), nil
+}
+
+func wordToData(local string) (string, error) {
+	r, err := docx.ReadDocxFile(local)
+	if err != nil {
+		return "", errors.New("读取pdf文件失败！")
+	}
+
+	docx := r.Editable()
+	docx.Replace("old_2_1", "new_2_1", -1)
+	docx.Replace("old_2_2", "new_2_2", -1)
+	res := docx.GetContent()
+	regex := regexp.MustCompile(`<w:t>(.*?)</w:t>`)
+	// 查找所有匹配项
+	matches := regex.FindAllStringSubmatch(res, -1)
+
+	resStr := ""
+	for _, match := range matches {
+		resStr += match[1]
+	}
+
+	defer r.Close()
+
+	return resStr, nil
 }
