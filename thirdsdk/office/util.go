@@ -80,7 +80,7 @@ func md5ByString(str string) (string, error) {
 func wordToData(local string) (string, error) {
 	r, err := docx.ReadDocxFile(local)
 	if err != nil {
-		return "", errors.New("读取pdf文件失败！")
+		return "", errors.New("读取文件失败！")
 	}
 
 	docx := r.Editable()

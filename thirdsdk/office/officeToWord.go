@@ -245,7 +245,7 @@ func PdfToContent(filePath string) (word string, fileSuffix string, FileSize int
 	pdf.DebugOn = true
 	text, err := readPdf(filePath) // Read local pdf file
 	if err != nil {
-		return "", "", 0, errors.New("pdf获取数据失败！")
+		return "", "", 0, errors.New("读取文件失败！")
 	}
 
 	return text, suffix, size, nil
@@ -273,7 +273,7 @@ func PdfUrlToContent(url string) (word string, fileSuffix string, FileSize int, 
 	pdf.DebugOn = true
 	text, err := readPdf(filePath) // Read local pdf file
 	if err != nil {
-		return "", "", 0, errors.New("pdf url获取数据失败！")
+		return "", "", 0, errors.New("读取文件失败！")
 	}
 
 	return text, suffix, size, nil
@@ -308,7 +308,7 @@ func PptToContent(filePath string) (word string, fileSuffix string, FileSize int
 
 	ppt, err := presentation.Open(filePath)
 	if err != nil {
-		return "", "", 0, errors.New("打开文件失败！")
+		return "", "", 0, errors.New("读取文件失败！")
 	}
 
 	var text string
@@ -362,7 +362,7 @@ func PptUrlToContent(url string) (word string, fileSuffix string, FileSize int, 
 
 	ppt, err := presentation.Open(filePath)
 	if err != nil {
-		return "", "", 0, errors.New("打开文件失败！")
+		return "", "", 0, errors.New("读取文件失败！")
 	}
 
 	var text string
