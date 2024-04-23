@@ -84,7 +84,7 @@ func PdfToContent(url string, pdfUrl string) (word string, fileSuffix string, Fi
 
 	body, _ := PostRequest(url, &InfoRequest{
 		Url:     pdfUrl,
-		PageNum: 30,
+		PageNum: 200,
 	})
 
 	resBody := InfoResponse{}
