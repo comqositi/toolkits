@@ -40,6 +40,8 @@ func ImageToContent(url string, imageUrl string) (word string, fileSuffix string
 
 	defer os.Remove(filePath)
 
+	url = strings.Trim(url, "/")
+	url = url + "/get_img_data"
 	body, _ := PostRequest(url, &InfoRequest{
 		Url: imageUrl,
 	})
@@ -62,9 +64,7 @@ func ImageToContent(url string, imageUrl string) (word string, fileSuffix string
 
 func PdfToContent(url string, pdfUrl string, pageNum int64) (word string, fileSuffix string, FileSize int, err error) {
 	if pageNum > 200 {
-		if err != nil {
-			return "", "", 0, errors.New("读取页数不能超过 200 页！")
-		}
+		return "", "", 0, errors.New("读取页数不能超过 200 页！")
 	}
 	suffix, err := getSuffix(pdfUrl)
 	if err != nil {
@@ -87,6 +87,8 @@ func PdfToContent(url string, pdfUrl string, pageNum int64) (word string, fileSu
 
 	defer os.Remove(filePath)
 
+	url = strings.Trim(url, "/")
+	url = url + "/get_pdf_data"
 	body, _ := PostRequest(url, &InfoRequest{
 		Url:     pdfUrl,
 		PageNum: pageNum,
